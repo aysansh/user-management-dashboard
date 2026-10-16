@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# User Management Dashboard
 
-## Getting Started
+Persian, right-to-left dashboard for browsing, creating, editing, and deleting users. The list is loaded from [JSONPlaceholder](https://jsonplaceholder.typicode.com/users). Creates, edits, and deletes stay in the browser and are applied on top of that remote list.
 
-First, run the development server:
+## Features
+
+- User list as a table on desktop and cards on smaller screens
+- Search by name, username, or email
+- Filter by city and sort by name, email, company, or newest
+- Paginated results
+- Create, edit, and delete users, with confirmation for delete
+- Detail page for each user
+- Loading, empty, error, and not-found states
+- Light, dark, and system themes
+- Persian UI with the Vazirmatn font
+
+## Tech stack
+
+- [Next.js](https://nextjs.org) 16 (App Router) and React 19
+- TypeScript and Tailwind CSS 4
+- [shadcn/ui](https://ui.shadcn.com)
+- [TanStack Query](https://tanstack.com/query) for server state
+- [Zustand](https://zustand.docs.pmnd.rs) for filters, pagination, and dialogs
+- [React Hook Form](https://react-hook-form.com) and [Zod](https://zod.dev) for the user form
+
+## Getting started
+
+Requires Node.js 20 or later.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm start` | Serve the production build |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run the TypeScript check |
+| `npm run format` | Format the project with Prettier |
+| `npm run format:check` | Check formatting without writing files |
 
-To learn more about Next.js, take a look at the following resources:
+## How data works
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`src/lib/users/api.ts` reads users from JSONPlaceholder. `src/lib/users/storage.ts` keeps local changes in `localStorage` under `user-dashboard-changes`: created users, updated users, and deleted ids.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`src/lib/users/data.ts` merges those changes with the remote list:
 
-## Deploy on Vercel
+- Deleted remote users are hidden.
+- Edited remote users replace the API record.
+- Created users are appended and receive the next numeric id.
+- Clearing site data for this origin removes every local change. The remote list comes back unchanged.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+No environment variables are required.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project structure
+
+```text
+src/
+  app/                  routes, root layout, and providers
+  components/users/     dashboard, table, cards, filters, and dialogs
+  components/ui/        shadcn/ui components
+  hooks/use-users.ts    TanStack Query hooks
+  lib/users/            API, merge logic, storage, and form schema
+  stores/               dashboard UI state
+  types/user.ts         user types
+```
+
+## Routes
+
+| Path | Page |
+| --- | --- |
+| `/` | User list |
+| `/users/[id]` | User details |
